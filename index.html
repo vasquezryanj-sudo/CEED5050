@@ -186,6 +186,7 @@ textarea:focus-visible{outline:none}
   <header class="bar">
     <p class="brand">Issue SpotBot<small>CEED 5050</small></p>
     <button class="barbtn" id="thinkBtn" aria-expanded="false" aria-controls="thinkPop"><span id="thinkLabel">All thinkers</span><span class="chev">▾</span></button>
+    <button class="barbtn icon" id="guideBtn" aria-label="PDF Study Guide" title="PDF Study Guide">&#128196;</button>
     <button class="barbtn icon" id="setBtn" aria-expanded="false" aria-controls="setPop" aria-label="Settings" title="Settings">⚙</button>
     <button class="barbtn primary" id="newChat" title="Start a new conversation">New</button>
     <div class="pop" id="thinkPop" hidden>
@@ -365,9 +366,8 @@ const STARTERS=[
 function renderEmpty(){
   msgs.replaceChildren();
   const d=document.createElement("div");d.className="empty";
-  d.innerHTML=`<h2>What's the situation?</h2><p>Select the thinkers you want included, type a prompt, and Issue SpotBot will consult the study guide and vocabulary terms and do its best to synthesize.</p><div class="starters"></div><p style="margin:14px 0 0"><button class="linkbtn" id="emptyGuide" style="padding:0;font-size:13px">Or browse the study guide: each thinker's core idea and vocabulary</button></p>`;
+  d.innerHTML=`<h2>What's the situation?</h2><p>Select the thinkers you want included, type a prompt, and Issue SpotBot will consult the study guide and vocabulary terms and do its best to synthesize.</p><div class="starters"></div>`;
   STARTERS.forEach((s,i)=>{const b=document.createElement("button");b.textContent=s;b.style.setProperty("--si",i);b.onclick=()=>{input.value=s;input.focus();autosize()};b.addEventListener("animationend",()=>b.classList.add("ready"),{once:true});d.querySelector(".starters").append(b)});
-  d.querySelector("#emptyGuide").onclick=e=>{e.stopPropagation();openGuide()};
   msgs.append(d);
 }
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
@@ -548,6 +548,7 @@ function openGuide(id){
 function closeGuide(){if(sheet)sheet.hidden=true}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){hideTip();closeGuide()}});
 document.getElementById("openGuide").onclick=e=>{e.stopPropagation();closePops();openGuide()};
+document.getElementById("guideBtn").onclick=e=>{e.stopPropagation();closePops();openGuide()};
 
 function addUser(text,ids){
   const d=document.createElement("div");d.className="msg user";
