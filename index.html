@@ -359,7 +359,7 @@ const STARTERS=[
 function renderEmpty(){
   msgs.replaceChildren();
   const d=document.createElement("div");d.className="empty";
-  d.innerHTML=`<h2>What's the situation? 🔍</h2><p>Each checked thinker will explain how they'd see it, in plain language, using the vocabulary from your study guide. Use the thinkers menu at the top to focus on just a few, or one.</p><div class="starters"></div><p style="margin:14px 0 0"><button class="linkbtn" id="emptyGuide" style="padding:0;font-size:13px">Or browse the study guide: each thinker's core idea and vocabulary</button></p>`;
+  d.innerHTML=`<h2>What's the situation?</h2><p>Select the thinkers you want included, type a prompt, and Issue SpotBot will consult the study guide and vocabulary terms and do its best to synthesize.</p><div class="starters"></div><p style="margin:14px 0 0"><button class="linkbtn" id="emptyGuide" style="padding:0;font-size:13px">Or browse the study guide: each thinker's core idea and vocabulary</button></p>`;
   STARTERS.forEach(s=>{const b=document.createElement("button");b.textContent=s;b.onclick=()=>{input.value=s;input.focus();autosize()};d.querySelector(".starters").append(b)});
   d.querySelector("#emptyGuide").onclick=e=>{e.stopPropagation();openGuide()};
   msgs.append(d);
