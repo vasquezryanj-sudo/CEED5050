@@ -86,13 +86,19 @@ main{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0}
 .bub .nm{font:700 15px var(--f-ui);color:var(--fg);padding-right:24px}
 .bub .hl{font:14px/1.4 var(--f-read);color:var(--ink)}
 .bub .sub{font:600 11.5px/1.3 var(--f-ui);color:var(--muted);margin-top:-2px}
-.info{border:0;background:none;color:inherit;font:600 14px var(--f-ui);cursor:pointer;padding:0 4px;margin-left:2px;opacity:.7;vertical-align:0}
+.info{border:0;background:none;color:inherit;font:600 13px var(--f-ui);cursor:pointer;padding:0 3px;margin-left:2px;opacity:.6;vertical-align:0;transition:opacity .15s}
 .info:hover{opacity:1}
 .term{border:0;font:inherit;color:inherit;cursor:pointer;font-weight:600;background:color-mix(in srgb,var(--c,var(--accent)) 16%,transparent);padding:0 2px;margin:0;line-height:inherit;border-radius:3px;text-decoration:underline dotted 1px;text-underline-offset:3px}
 .term:hover{background:color-mix(in srgb,var(--c,var(--accent)) 28%,transparent)}
-.tip{position:fixed;z-index:70;width:max-content;max-width:min(380px,calc(100vw - 24px));background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-top:3px solid var(--tc,var(--accent));border-radius:12px;box-shadow:0 12px 32px rgba(10,15,30,.22);padding:11px 14px 12px;font:14.5px/1.55 var(--f-read)}
-.tip h5{font:700 11.5px var(--f-ui);letter-spacing:.07em;text-transform:uppercase;margin:0 0 4px;color:var(--tc,var(--accent))}
+@keyframes pop-in{from{opacity:0;transform:translate3d(0,8px,0) scale(.97)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+.tip{position:fixed;z-index:70;width:max-content;max-width:min(320px,calc(100vw - 24px));background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-top:3px solid var(--tc,var(--accent));border-radius:12px;box-shadow:0 8px 28px rgba(20,16,50,.14);padding:10px 13px 11px;font:14px/1.55 var(--f-read)}
 .tip p{margin:0}
+.info-card{position:fixed;z-index:70;width:min(340px,calc(100vw - 24px));max-height:min(58vh,400px);overflow-y:auto;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-top:3px solid var(--tc,var(--accent));border-radius:14px;box-shadow:0 12px 36px rgba(20,16,50,.16);padding:14px 16px 16px;font:14px/1.6 var(--f-read)}
+.info-card .ic-core{margin:0 0 12px;color:var(--ink)}
+.info-card .ic-vlab{font:700 10.5px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.info-card .ic-term{padding:7px 0;border-top:1px solid var(--rule);font:13.5px/1.5 var(--f-read)}
+.info-card .ic-term b{font-family:var(--f-ui);font-weight:700;color:var(--tc,var(--accent))}
+@media (prefers-reduced-motion:no-preference){.tip,.info-card{animation:pop-in .22s cubic-bezier(.25,1,.5,1) both}}
 .sheet{position:fixed;inset:0;z-index:40;background:rgba(10,15,30,.5);overflow-y:auto;padding:20px 12px 40px}
 .paper{max-width:780px;margin:0 auto;background:var(--panel);border-radius:14px;padding:22px 24px 30px;box-shadow:0 20px 50px rgba(10,15,30,.3)}
 .paper .top{display:flex;align-items:center;gap:8px;position:sticky;top:-20px;background:var(--panel);padding:8px 0 10px;z-index:1}
@@ -403,26 +409,51 @@ function rich(s,ids){
     return f?`<button type="button" class="term" data-tid="${f.id}" data-tk="${f.k}">${x}</button>`:`<strong>${x}</strong>`});
 }
 const firstSentence=s=>{const m=String(s||"").match(/^.*?[.!?](?=\s|$)/);return m?m[0]:String(s||"")};
-/* ---------- tap popovers for names and terms ---------- */
-let tipEl=null,tipPinned=false,tipAnchor=null;
-function hideTip(){if(tipEl){tipEl.remove();tipEl=null;tipAnchor=null;tipPinned=false}}
-function showTip(anchor,title,text,color,pin){
-  hideTip();tipEl=el("div","tip");const h=el("h5");h.textContent=title;const p=el("p");p.textContent=text;tipEl.append(h,p);
-  tipEl.style.setProperty("--tc",color);tipEl.addEventListener("click",e=>e.stopPropagation());document.body.append(tipEl);
-  tipAnchor=anchor;tipPinned=!!pin;
-  const r=anchor.getBoundingClientRect(),w=tipEl.offsetWidth,hh=tipEl.offsetHeight;
-  let left=Math.max(12,Math.min(r.left,innerWidth-w-12)),top=r.bottom+8;if(top+hh>innerHeight-12)top=Math.max(12,r.top-hh-8);
-  tipEl.style.left=left+"px";tipEl.style.top=top+"px";
+/* ---------- click popovers for (i) cards and vocab terms ---------- */
+let tipEl=null,tipAnchor=null;
+function hideTip(){if(tipEl){tipEl.remove();tipEl=null;tipAnchor=null}}
+function positionTip(el,anchor){
+  document.body.append(el);
+  const r=anchor.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;
+  let left=Math.max(12,Math.min(r.left,innerWidth-w-12)),top=r.bottom+8;
+  if(top+h>innerHeight-12)top=Math.max(12,r.top-h-8);
+  el.style.left=left+"px";el.style.top=top+"px";
 }
-function tipFor(t,pin){
-  if(t.classList.contains("info")){const g=BY[t.dataset.info];showTip(t,g.name+" · core idea",g.core,COLORS[g.id],pin)}
-  else{const g=BY[t.dataset.tid],[k,v]=g.terms[+t.dataset.tk];showTip(t,k+" · "+g.short,v,COLORS[g.id],pin)}
+function showTermTip(anchor,text,color){
+  hideTip();
+  tipEl=el("div","tip");
+  const p=el("p");p.textContent=text;tipEl.append(p);
+  tipEl.style.setProperty("--tc",color);
+  tipEl.addEventListener("click",e=>e.stopPropagation());
+  tipAnchor=anchor;
+  positionTip(tipEl,anchor);
 }
-document.addEventListener("click",e=>{const t=e.target.closest(".term,.info");if(!t)return;e.stopPropagation();e.preventDefault();
-  if(tipEl&&tipAnchor===t&&tipPinned){hideTip();return}closePops();tipFor(t,true)},true);
-const canHover=matchMedia("(hover:hover) and (pointer:fine)");
-document.addEventListener("mouseover",e=>{if(!canHover.matches||tipPinned)return;const t=e.target.closest(".info,.term");if(t&&t!==tipAnchor)tipFor(t,false)});
-document.addEventListener("mouseout",e=>{if(!canHover.matches||tipPinned||!tipAnchor)return;const t=e.target.closest(".info,.term");if(t===tipAnchor&&!t.contains(e.relatedTarget))hideTip()});
+function showInfoCard(anchor,g){
+  hideTip();
+  const card=el("div","info-card");
+  card.style.setProperty("--tc",COLORS[g.id]);
+  const core=el("p","ic-core");core.textContent=g.core;card.append(core);
+  if(g.terms&&g.terms.length){
+    const lbl=el("p","ic-vlab");lbl.textContent="Vocabulary";card.append(lbl);
+    g.terms.forEach(([k,v])=>{
+      const row=el("div","ic-term");
+      const b=document.createElement("b");b.textContent=k+": ";
+      row.append(b,document.createTextNode(v));card.append(row);
+    });
+  }
+  card.addEventListener("click",e=>e.stopPropagation());
+  tipEl=card;tipAnchor=anchor;
+  positionTip(card,anchor);
+}
+document.addEventListener("click",e=>{
+  const t=e.target.closest(".term,.info");
+  if(!t){return}
+  e.stopPropagation();e.preventDefault();
+  if(tipAnchor===t){hideTip();return}
+  closePops();
+  if(t.classList.contains("info")){showInfoCard(t,BY[t.dataset.info])}
+  else{const g=BY[t.dataset.tid],[,v]=g.terms[+t.dataset.tk];showTermTip(t,v,COLORS[g.id])}
+},true);
 function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
 function clean(o){if(!o||!Array.isArray(o.thinkers))return null;
   o.thinkers=o.thinkers.filter(t=>t&&BY[t.id]);o.intersections=(o.intersections||[]).filter(x=>x&&BY[x.a]&&BY[x.b]&&x.a!==x.b);return o.thinkers.length?o:null}
