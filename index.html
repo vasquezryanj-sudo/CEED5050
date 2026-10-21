@@ -185,6 +185,63 @@ textarea:focus{border-color:var(--accent);outline:none}
 }
 button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 textarea:focus-visible{outline:none}
+
+/* ── SpotBot character ── */
+.sb-body{fill:var(--accent)}
+.sb-screen{fill:var(--ink);opacity:.7}
+.sb-tip{fill:color-mix(in srgb,var(--accent) 50%,white)}
+.sb-tip-glow{fill:color-mix(in srgb,var(--accent) 28%,transparent)}
+.sb-eye{fill:color-mix(in srgb,var(--accent) 38%,white)}
+.sb-smile{stroke:color-mix(in srgb,var(--accent) 38%,white)}
+.sb-dot{fill:rgba(255,255,255,.22)}
+.sb-bar{fill:rgba(255,255,255,.14)}
+.sb-foot{fill:color-mix(in srgb,var(--accent) 75%,black)}
+@keyframes bot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes bot-blink{0%,85%,100%{transform:scaleY(1)}91%,97%{transform:scaleY(.08)}}
+@keyframes bubble-in{from{opacity:0;transform:scale(.82) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes think-dot{0%,100%{opacity:1}45%{opacity:.25}}
+@media (prefers-reduced-motion:no-preference){
+  .spotbot-anim{animation:bot-float 3.4s ease-in-out infinite}
+  .spotbot-eye{animation:bot-blink 5s ease-in-out infinite;transform-origin:50% 50%}
+  .spotbot-eye:nth-child(2){animation-delay:.18s}
+  .spotbot-bubble{animation:bubble-in .38s cubic-bezier(.25,1,.5,1) .55s both}
+  .bot-thinking .spotbot-eye{animation:think-dot .65s ease-in-out infinite}
+  .bot-thinking .spotbot-eye:nth-child(2){animation-delay:.22s}
+}
+/* Composer bot row */
+.composer-bot{display:flex;align-items:flex-end;gap:10px;padding:6px 16px 0;max-width:760px;margin:0 auto}
+.spotbot-wrap{position:relative;cursor:pointer;flex-shrink:0;transition:transform .2s}
+.spotbot-wrap:hover{transform:translateY(-2px)}
+.spotbot-wrap:hover .spotbot-svg{filter:drop-shadow(0 6px 20px color-mix(in srgb,var(--accent) 42%,transparent))}
+.spotbot-svg{filter:drop-shadow(0 3px 10px color-mix(in srgb,var(--accent) 22%,transparent));transition:filter .2s;display:block}
+.spotbot-bubble{background:var(--panel);border:1.5px solid var(--rule);border-radius:14px 14px 14px 4px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 10%,transparent);margin-bottom:4px}
+.spotbot-bubble em{font-style:normal;color:var(--accent)}
+/* How-it-works modal */
+.how-overlay{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:color-mix(in srgb,#000 40%,transparent);backdrop-filter:blur(6px)}
+.how-card{background:var(--panel);border:1.5px solid var(--rule);border-radius:22px;padding:28px 28px 24px;max-width:390px;width:100%;box-shadow:0 16px 56px color-mix(in srgb,var(--accent) 22%,transparent);animation:pop-in .25s cubic-bezier(.25,1,.5,1) both}
+.how-card h3{font:800 17px/1.2 var(--f-ui);margin:0 0 22px;display:flex;align-items:center;gap:10px}
+.how-close{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;line-height:1;padding:2px 4px;border-radius:6px;transition:color .15s,background .15s}
+.how-close:hover{color:var(--ink);background:var(--accent-soft)}
+.how-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:15px}
+.how-step:last-child{margin-bottom:0}
+.how-num{min-width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 13px/30px var(--f-ui);text-align:center;flex-shrink:0}
+.how-body strong{font-size:14px;font-weight:700;display:block;margin-bottom:3px}
+.how-body p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+/* Empty state redesign */
+.empty-new{display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 0 12px}
+.empty-new h2{font:800 26px/1.2 var(--f-ui);font-stretch:85%;margin:10px 0 7px;text-wrap:balance}
+.empty-new .tagline{color:var(--muted);font-size:15px;margin:0 0 12px;max-width:44ch}
+.empty-new .how-trigger{background:none;border:none;cursor:pointer;color:var(--accent);font:600 13px/1 var(--f-ui);text-decoration:underline;text-underline-offset:3px;padding:0;margin-bottom:26px;transition:opacity .15s}
+.empty-new .how-trigger:hover{opacity:.72}
+.starters-label{font:600 11px/1 var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;align-self:flex-start}
+.empty-new .starters{width:100%;text-align:left}
+@media (prefers-reduced-motion:no-preference){
+  .empty-new h2{animation:fade-up .55s cubic-bezier(.25,1,.5,1) .18s both}
+  .empty-new .tagline{animation:fade-up .55s cubic-bezier(.25,1,.5,1) .28s both}
+  .empty-new .how-trigger{animation:fade-up .45s cubic-bezier(.25,1,.5,1) .36s both}
+  .starters-label{animation:fade-up .45s cubic-bezier(.25,1,.5,1) .42s both}
+}
+@media (max-width:520px){.empty-new h2{font-size:22px}.spotbot-bubble{display:none}.composer-bot{padding:4px 12px 0}}
 </style>
 </head>
 <body>
@@ -218,7 +275,29 @@ textarea:focus-visible{outline:none}
   </header>
   <main>
     <div class="thread" id="thread"><div class="inner" id="msgs"></div></div>
-    <div class="composer">
+    <div class="composer" id="composer-bot-wrap">
+      <div class="composer-bot">
+        <div class="spotbot-wrap" id="botBtn" role="button" tabindex="0" aria-label="How Issue SpotBot works" title="How it works">
+          <svg class="spotbot-anim spotbot-svg" width="40" height="47" viewBox="0 0 96 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <rect x="45" y="3" width="6" height="14" rx="3" class="sb-body"/>
+  <circle cx="48" cy="1" r="7" class="sb-tip-glow"/>
+  <circle cx="48" cy="1" r="4.5" class="sb-tip"/>
+  <rect x="10" y="16" width="76" height="50" rx="16" class="sb-body"/>
+  <rect x="20" y="24" width="56" height="34" rx="10" class="sb-screen"/>
+  <rect class="spotbot-eye sb-eye" x="26" y="32" width="15" height="14" rx="4"/>
+  <rect class="spotbot-eye sb-eye" x="55" y="32" width="15" height="14" rx="4"/>
+  <path d="M31 51 Q48 61 65 51" stroke-width="3" stroke-linecap="round" fill="none" class="sb-smile"/>
+  <rect x="16" y="64" width="64" height="40" rx="14" class="sb-body"/>
+  <circle cx="34" cy="79" r="5" class="sb-dot"/>
+  <circle cx="48" cy="79" r="5" class="sb-dot"/>
+  <circle cx="62" cy="79" r="5" class="sb-dot"/>
+  <rect x="26" y="90" width="44" height="8" rx="4" class="sb-bar"/>
+  <rect x="21" y="99" width="20" height="12" rx="6" class="sb-foot"/>
+  <rect x="55" y="99" width="20" height="12" rx="6" class="sb-foot"/>
+</svg>
+        </div>
+        <div class="spotbot-bubble">Ask me <em>anything</em> about your readings</div>
+      </div>
       <div class="inner">
         <textarea id="input" rows="1" placeholder="Describe a situation, or ask a follow-up..."></textarea>
         <button class="btn" id="send">Ask</button>
@@ -226,6 +305,16 @@ textarea:focus-visible{outline:none}
       <p class="hint" id="hint"></p>
     </div>
   </main>
+
+<div class="how-overlay" id="howOverlay" hidden>
+  <div class="how-card" role="dialog" aria-modal="true" aria-labelledby="howTitle">
+    <h3 id="howTitle">How Issue SpotBot works <button class="how-close" id="howClose" aria-label="Close">×</button></h3>
+    <div class="how-step"><div class="how-num">1</div><div class="how-body"><strong>Pick your thinkers</strong><p>Use "All thinkers" in the header to choose which philosophers to include in the analysis.</p></div></div>
+    <div class="how-step"><div class="how-num">2</div><div class="how-body"><strong>Describe the situation</strong><p>Type a real-world dilemma, policy question, or ethical scenario in the box below.</p></div></div>
+    <div class="how-step"><div class="how-num">3</div><div class="how-body"><strong>Get the analysis</strong><p>SpotBot reads the assigned study guide and shows how each thinker would reason through it.</p></div></div>
+    <div class="how-step"><div class="how-num">4</div><div class="how-body"><strong>Go deeper</strong><p>Ask follow-up questions to explore specific arguments, test intuitions, or compare thinkers.</p></div></div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -363,6 +452,7 @@ const TOOLS=[{name:"search_readings",description:"Search the full text of the as
 let history=[];  // API messages
 let busy=false, ctl=null;
 const msgs=document.getElementById("msgs"), thread=document.getElementById("thread"), input=document.getElementById("input"), send=document.getElementById("send");
+const composerBotWrap=document.getElementById("composer-bot-wrap");
 
 const STARTERS=[
   "A nurse notices a colleague cutting corners on hand-washing. Reporting it could get the colleague fired, and the colleague is a single parent.",
@@ -372,9 +462,26 @@ const STARTERS=[
 ];
 function renderEmpty(){
   msgs.replaceChildren();
-  const d=document.createElement("div");d.className="empty";
-  d.innerHTML=`<h2>What's the situation?</h2><p>Select the thinkers you want included, type a prompt, and Issue SpotBot will consult the study guide and vocabulary terms and do its best to synthesize.</p><div class="starters"></div>`;
+  const d=document.createElement("div");d.className="empty-new";
+  d.innerHTML=`<div class="hero-bot"><svg class="spotbot-anim spotbot-svg" width="88" height="103" viewBox="0 0 96 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <rect x="45" y="3" width="6" height="14" rx="3" class="sb-body"/>
+  <circle cx="48" cy="1" r="7" class="sb-tip-glow"/>
+  <circle cx="48" cy="1" r="4.5" class="sb-tip"/>
+  <rect x="10" y="16" width="76" height="50" rx="16" class="sb-body"/>
+  <rect x="20" y="24" width="56" height="34" rx="10" class="sb-screen"/>
+  <rect class="spotbot-eye sb-eye" x="26" y="32" width="15" height="14" rx="4"/>
+  <rect class="spotbot-eye sb-eye" x="55" y="32" width="15" height="14" rx="4"/>
+  <path d="M31 51 Q48 61 65 51" stroke-width="3" stroke-linecap="round" fill="none" class="sb-smile"/>
+  <rect x="16" y="64" width="64" height="40" rx="14" class="sb-body"/>
+  <circle cx="34" cy="79" r="5" class="sb-dot"/>
+  <circle cx="48" cy="79" r="5" class="sb-dot"/>
+  <circle cx="62" cy="79" r="5" class="sb-dot"/>
+  <rect x="26" y="90" width="44" height="8" rx="4" class="sb-bar"/>
+  <rect x="21" y="99" width="20" height="12" rx="6" class="sb-foot"/>
+  <rect x="55" y="99" width="20" height="12" rx="6" class="sb-foot"/>
+</svg></div><h2>What's the situation?</h2><p class="tagline">Describe a real-world dilemma and SpotBot shows how each selected thinker would reason through it.</p><button class="how-trigger" type="button">How does it work?</button><p class="starters-label">Try an example</p><div class="starters"></div>`;
   STARTERS.forEach((s,i)=>{const b=document.createElement("button");b.textContent=s;b.style.setProperty("--si",i);b.onclick=()=>{input.value=s;input.focus();autosize()};b.addEventListener("animationend",()=>b.classList.add("ready"),{once:true});d.querySelector(".starters").append(b)});
+  d.querySelector(".how-trigger").onclick=showHow;
   msgs.append(d);
 }
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
@@ -612,7 +719,7 @@ async function ask(){
   closePops();
   if(msgs.querySelector(".empty"))msgs.replaceChildren();
   input.value="";autosize();addUser(text,ids);
-  const bot=addBot();busy=true;send.disabled=true;ctl=new AbortController();
+  const bot=addBot();busy=true;send.disabled=true;composerBotWrap.classList.add("bot-thinking");ctl=new AbortController();
   const userTurn={role:"user",content:`[Selected thinkers: ${ids.map(i=>BY[i].name).join(", ")}]\n\n${text}`};
   const working=[...history,userTurn];
   const deep=history.length>0;
@@ -646,8 +753,14 @@ async function ask(){
     tools.append(cp);bot.append(tools);
   }catch(e){
     bot.innerHTML="";const p=document.createElement("p");p.className="err";p.textContent=e.name==="AbortError"?"Stopped.":(e.message==="Failed to fetch"?"Couldn't reach Anthropic's API. Check your internet connection.":e.message);bot.append(p);
-  }finally{busy=false;send.disabled=false;scroll();input.focus()}
+  }finally{busy=false;send.disabled=false;composerBotWrap.classList.remove("bot-thinking");scroll();input.focus()}
 }
+function showHow(){document.getElementById("howOverlay").hidden=false}
+function hideHow(){document.getElementById("howOverlay").hidden=true}
+document.getElementById("howClose").onclick=hideHow;
+document.getElementById("howOverlay").addEventListener("click",e=>{if(e.target===e.currentTarget)hideHow()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("howOverlay").hidden)hideHow()});
+const botBtn=document.getElementById("botBtn");botBtn.onclick=showHow;botBtn.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showHow()}});
 send.onclick=ask;
 input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();ask()}});
 function autosize(){input.style.height="auto";input.style.height=Math.min(input.scrollHeight,200)+"px"}
