@@ -229,6 +229,10 @@ textarea:focus-visible{outline:none}
 .how-body p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
 /* Empty state redesign */
 .empty-new{display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 0 12px}
+.hero-bot{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+.hero-bubble{position:relative;background:var(--panel);border:1.5px solid var(--rule);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--ink);line-height:1.4;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 12%,transparent);text-align:left;max-width:180px;animation:bubble-in .38s cubic-bezier(.25,1,.5,1) .5s both}
+.hero-bubble::before{content:'';position:absolute;left:-9px;top:14px;border:6px solid transparent;border-right-color:var(--rule)}
+.hero-bubble::after{content:'';position:absolute;left:-6px;top:15px;border:5px solid transparent;border-right-color:var(--panel)}
 .empty-new h2{font:800 26px/1.2 var(--f-ui);font-stretch:85%;margin:10px 0 7px;text-wrap:balance}
 .empty-new .tagline{color:var(--muted);font-size:15px;margin:0 0 12px;max-width:44ch}
 .empty-new .how-trigger{background:none;border:none;cursor:pointer;color:var(--accent);font:600 13px/1 var(--f-ui);text-decoration:underline;text-underline-offset:3px;padding:0;margin-bottom:26px;transition:opacity .15s}
@@ -249,7 +253,7 @@ textarea:focus-visible{outline:none}
   <header class="bar">
     <p class="brand">Issue SpotBot<small>CEED 5050</small></p>
     <button class="barbtn" id="thinkBtn" aria-expanded="false" aria-controls="thinkPop"><span id="thinkLabel">All thinkers</span><span class="chev">▾</span></button>
-    <button class="barbtn icon" id="guideBtn" aria-label="PDF Study Guide" title="PDF Study Guide">&#128196;</button>
+
     <button class="barbtn icon" id="setBtn" aria-expanded="false" aria-controls="setPop" aria-label="Settings" title="Settings">⚙</button>
     <button class="barbtn primary" id="newChat" title="Start a new conversation">New</button>
     <div class="pop" id="thinkPop" hidden>
@@ -479,7 +483,7 @@ function renderEmpty(){
   <rect x="26" y="90" width="44" height="8" rx="4" class="sb-bar"/>
   <rect x="21" y="99" width="20" height="12" rx="6" class="sb-foot"/>
   <rect x="55" y="99" width="20" height="12" rx="6" class="sb-foot"/>
-</svg></div><h2>What's the situation?</h2><p class="tagline">Describe a real-world dilemma and SpotBot shows how each selected thinker would reason through it.</p><button class="how-trigger" type="button">How does it work?</button><p class="starters-label">Try an example</p><div class="starters"></div>`;
+</svg><div class="hero-bubble">I'm Issue SpotBot!<br>I spot issues!</div></div><h2>What's the situation?</h2><p class="tagline">Describe a real-world dilemma and SpotBot shows how each selected thinker would reason through it.</p><button class="how-trigger" type="button">How does it work?</button><p class="starters-label">Try an example</p><div class="starters"></div>`;
   STARTERS.forEach((s,i)=>{const b=document.createElement("button");b.textContent=s;b.style.setProperty("--si",i);b.onclick=()=>{input.value=s;input.focus();autosize()};b.addEventListener("animationend",()=>b.classList.add("ready"),{once:true});d.querySelector(".starters").append(b)});
   d.querySelector(".how-trigger").onclick=showHow;
   msgs.append(d);
@@ -687,7 +691,6 @@ function openGuide(id){
 function closeGuide(){if(sheet)sheet.hidden=true}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){hideTip();closeGuide()}});
 document.getElementById("openGuide").onclick=e=>{e.stopPropagation();closePops();openGuide()};
-document.getElementById("guideBtn").onclick=e=>{e.stopPropagation();closePops();openGuide()};
 
 function addUser(text,ids){
   const d=document.createElement("div");d.className="msg user";
