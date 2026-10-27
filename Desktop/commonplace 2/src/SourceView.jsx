@@ -101,6 +101,73 @@ function applyOutline(e, value, setBody) {
 }
 // ───────────────────────────────────────────────────────────────────────────
 
+function TermComposer({ sourceId, onClose }) {
+  const { saveTerm } = useData();
+  const [term, setTerm] = useState('');
+  const [definition, setDefinition] = useState('');
+  const [busy, setBusy] = useState(false);
+  const canSave = term.trim() && definition.trim();
+  const save = async () => {
+    if (!canSave) return;
+    setBusy(true);
+    try { await saveTerm({ source_id: sourceId, term, definition }); onClose(); } finally { setBusy(false); }
+  };
+  return (
+    <div className="term-composer">
+      <input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Term" autoFocus />
+      <textarea rows={2} value={definition} onChange={(e) => setDefinition(e.target.value)}
+        onKeyDown={submitOnMetaEnter(save)} placeholder="Definition" />
+      <div className="form-actions">
+        <span className="hint">⌘ Enter to save</span>
+        <span className="spacer" />
+        <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
+        <button type="button" className="btn" disabled={busy || !canSave} onClick={save}>Save</button>
+      </div>
+    </div>
+  );
+}
+
+function TermCard({ term: t }) {
+  const { saveTerm, deleteTerm } = useData();
+  const [editing, setEditing] = useState(false);
+  const [term, setTerm] = useState(t.term);
+  const [definition, setDefinition] = useState(t.definition);
+  const save = async () => {
+    if (!term.trim() || !definition.trim()) return;
+    await saveTerm({ source_id: t.source_id, term, definition }, t.id);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <li className="term-card editing">
+        <input value={term} onChange={(e) => setTerm(e.target.value)} autoFocus />
+        <textarea rows={Math.max(2, definition.split('\n').length + 1)} value={definition}
+          onChange={(e) => setDefinition(e.target.value)} onKeyDown={submitOnMetaEnter(save)} />
+        <div className="form-actions">
+          <span className="spacer" />
+          <button type="button" className="btn-ghost" onClick={() => { setTerm(t.term); setDefinition(t.definition); setEditing(false); }}>Cancel</button>
+          <button type="button" className="btn" onClick={save}>Save changes</button>
+        </div>
+      </li>
+    );
+  }
+  return (
+    <li className="term-card">
+      <p className="term-name">{t.term}</p>
+      <p className="term-def">{t.definition}</p>
+      <div className="card-actions">
+        <span className="hint">{shortDate(t.created_at)}</span>
+        <span className="spacer" />
+        <button type="button" className="btn-ghost reveal" onClick={() => setEditing(true)}>Edit</button>
+        <button type="button" className="btn-ghost btn-quiet-danger reveal" onClick={() => {
+          if (window.confirm('Delete this term?')) deleteTerm(t.id);
+        }}>Delete</button>
+      </div>
+    </li>
+  );
+}
+
 function QuoteCard({ quote, source, activeTags, onTag, focused }) {
   const { saveQuote, deleteQuote } = useData();
   const [editing, setEditing] = useState(false);
@@ -207,14 +274,21 @@ function NoteComposer({ sourceId }) {
 }
 
 export default function SourceView({ id, focusQuoteId, onExport }) {
-  const { sources, quotes, notes, saveQuote, loading } = useData();
+  const { sources, quotes, notes, terms, saveQuote, loading } = useData();
   const source = sources.find((s) => s.id === id);
   const [editing, setEditing] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [addingTerm, setAddingTerm] = useState(false);
   const [tagFilter, setTagFilter] = useState([]);
+  const [termSearch, setTermSearch] = useState('');
 
   const myQuotes = useMemo(() => quotes.filter((q) => q.source_id === id), [quotes, id]);
   const myNotes = useMemo(() => notes.filter((n) => n.source_id === id), [notes, id]);
+  const myTerms = useMemo(() => terms.filter((t) => t.source_id === id), [terms, id]);
+  const shownTerms = useMemo(() => {
+    const q = termSearch.trim().toLowerCase();
+    return q ? myTerms.filter((t) => t.term.toLowerCase().includes(q) || t.definition.toLowerCase().includes(q)) : myTerms;
+  }, [myTerms, termSearch]);
   const tagsHere = useMemo(() => [...new Set(myQuotes.flatMap((q) => q.tags))].sort(), [myQuotes]);
   const shown = tagFilter.length ? myQuotes.filter((q) => tagFilter.every((t) => q.tags.includes(t))) : myQuotes;
   const toggle = (t) => setTagFilter((f) => (f.includes(t) ? f.filter((x) => x !== t) : [...f, t]));
@@ -239,7 +313,7 @@ export default function SourceView({ id, focusQuoteId, onExport }) {
         </div>
         <div className="source-actions">
           <button type="button" className="btn-ghost" onClick={() => setEditing(true)}>Edit source</button>
-          <button type="button" className="btn-ghost" onClick={() => onExport({ source, quotes: myQuotes, notes: myNotes })}>Export PDF</button>
+          <button type="button" className="btn-ghost" onClick={() => onExport({ source, quotes: myQuotes, notes: myNotes, terms: myTerms })}>Export PDF</button>
         </div>
       </header>
 
@@ -265,7 +339,26 @@ export default function SourceView({ id, focusQuoteId, onExport }) {
           </ul>
         </section>
 
-        <section className="page page-right" aria-label="Quotes">
+        <section className="page page-right" aria-label="Terms and Quotes">
+          <div className="page-head">
+            <h2>Terms</h2>
+            <span className="hint">{myTerms.length}</span>
+            <span className="spacer" />
+            {!addingTerm && <button type="button" className="btn" onClick={() => setAddingTerm(true)}>Add term</button>}
+          </div>
+          {myTerms.length > 0 && (
+            <input className="term-search" placeholder="Search terms…" value={termSearch}
+              onChange={(e) => setTermSearch(e.target.value)} />
+          )}
+          {addingTerm && <TermComposer sourceId={source.id} onClose={() => setAddingTerm(false)} />}
+          {myTerms.length === 0 && !addingTerm && <p className="hint">No terms yet.</p>}
+          {shownTerms.length === 0 && myTerms.length > 0 && <p className="hint">No terms match.</p>}
+          <ul className="term-list">
+            {shownTerms.map((t) => <TermCard key={t.id} term={t} />)}
+          </ul>
+
+          <hr className="page-divider" />
+
           <div className="page-head">
             <h2>Quotes</h2>
             <span className="hint">{shown.length}{tagFilter.length ? ` of ${myQuotes.length}` : ''}</span>
